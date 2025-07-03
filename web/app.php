@@ -6,8 +6,10 @@ use Symfony\Component\HttpFoundation\Request;
 $loader = require __DIR__.'/../app/autoload.php';
 include_once __DIR__.'/../var/bootstrap.php.cache';
 
+$trustedProxies = explode(',', getenv('TRUSTED_PROXIES') ?: '');
+Request::setTrustedProxies($trustedProxies, Request::HEADER_X_FORWARDED_ALL);
+
 $kernel = new AppKernel('prod', false);
-$kernel->loadClassCache();
 //$kernel = new AppCache($kernel);
 
 // When using the HttpCache, you need to call the method in your front controller instead of relying on the configuration parameter
