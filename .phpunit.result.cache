@@ -1,1 +1,0 @@
-{"version":1,"defects":{"Tests\\AppBundle\\Controller\\DefaultControllerTest::testIndex":3,"Tests\\AppBundle\\Controller\\TaskControllerTest::testGetList":3},"times":{"Tests\\AppBundle\\Controller\\DefaultControllerTest::testIndex":0.292,"Tests\\AppBundle\\Controller\\TaskControllerTest::testGetList":0.204}}
