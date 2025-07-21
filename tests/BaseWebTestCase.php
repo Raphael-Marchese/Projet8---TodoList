@@ -20,6 +20,7 @@ abstract class BaseWebTestCase extends WebTestCase
     {
         $this->client = static::createClient();
     }
+
     protected function createAuthenticatedClient(string $email = 'user@test.fr'): Client
     {
         $container = $this->client->getContainer();
@@ -53,5 +54,4 @@ abstract class BaseWebTestCase extends WebTestCase
     {
         return $this->client->getContainer()->get('router')->generate($route, $params);
     }
-
 }
