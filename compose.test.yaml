@@ -1,0 +1,20 @@
+# compose.test.yaml
+version: '3.8'
+
+services:
+  # On ne redéfinit pas le service 'php' car il est identique.
+  # On va juste le faire pointer vers la nouvelle base de données.
+  # Mais on a besoin de surcharger le service de la BDD.
+
+  db_test: # On utilise un nom de service différent, ex: 'db_test'
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      # Le nom de la BDD peut rester le même car le service est isolé
+      MYSQL_DATABASE: symfony_test
+    volumes:
+      - db-data-test:/var/lib/mysql # Volume séparé !
+    # Pas besoin de ports, car seul le service 'php' y accède
+
+volumes:
+  db-data-test: # Volume nommé séparé

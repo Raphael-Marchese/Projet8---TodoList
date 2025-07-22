@@ -7,6 +7,7 @@ use AppBundle\Form\UserType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
@@ -39,6 +40,12 @@ class UserController extends Controller
             $this->addFlash('success', "L'utilisateur a bien été ajouté.");
 
             return $this->redirectToRoute('user_list');
+        }
+
+        if ($form->isSubmitted() && !$form->isValid()) {
+            return $this->render('user/create.html.twig', [
+                'form' => $form->createView(),
+            ], new Response('', Response::HTTP_UNPROCESSABLE_ENTITY));
         }
 
         return $this->render('user/create.html.twig', ['form' => $form->createView()]);
