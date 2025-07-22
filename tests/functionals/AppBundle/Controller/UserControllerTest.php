@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\functionals\AppBundle\Controller;
 
-use AppBundle\Entity\Task;
 use AppBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -83,5 +82,4 @@ class UserControllerTest extends BaseWebTestCase
         $user = $userRepository->findOneBy(['email' => 'testUser@test.fr']);
         $this->assertEquals('User test edit username', $user->getUsername());
     }
-
 }
