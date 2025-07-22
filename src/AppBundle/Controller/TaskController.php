@@ -7,6 +7,7 @@ use AppBundle\Form\TaskType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class TaskController extends Controller
 {
@@ -15,7 +16,10 @@ class TaskController extends Controller
      */
     public function listAction()
     {
-        return $this->render('task/list.html.twig', ['tasks' => $this->getDoctrine()->getRepository('AppBundle:Task')->findAll()]);
+        return $this->render(
+            'task/list.html.twig',
+            ['tasks' => $this->getDoctrine()->getRepository('AppBundle:Task')->findAll()]
+        );
     }
 
     /**
@@ -38,7 +42,11 @@ class TaskController extends Controller
 
             return $this->redirectToRoute('task_list');
         }
-
+        if ($form->isSubmitted() && !$form->isValid()) {
+            return $this->render('task/create.html.twig', [
+                'form' => $form->createView(),
+            ], new Response('', Response::HTTP_UNPROCESSABLE_ENTITY));
+        }
         return $this->render('task/create.html.twig', ['form' => $form->createView()]);
     }
 
@@ -51,7 +59,7 @@ class TaskController extends Controller
 
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 
             $this->addFlash('success', 'La tâche a bien été modifiée.');

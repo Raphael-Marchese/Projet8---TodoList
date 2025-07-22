@@ -1,21 +1,13 @@
 <?php
 
-namespace Tests\AppBundle\Controller;
+namespace Tests\functionals\AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Tests\BaseWebTestCase;
 
-class DefaultControllerTest extends WebTestCase
+class DefaultControllerTest extends BaseWebTestCase
 {
-    private $client = null;
-
-    public function setUp() : void
-
-    {
-        $this->client = static::createClient();
-    }
-
     public function testIndex()
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/');

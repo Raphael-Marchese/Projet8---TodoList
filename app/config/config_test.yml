@@ -14,3 +14,13 @@ web_profiler:
 
 swiftmailer:
     disable_delivery: true
+
+doctrine:
+    dbal:
+        # Remplacez 'votre_nom_de_bdd' par le nom de votre base de données principale.
+        # Nous ajoutons le suffixe '_test' pour créer un nom unique.
+        dbname: 'symfony_test'
+
+parameters:
+    database_host: db_test
+
