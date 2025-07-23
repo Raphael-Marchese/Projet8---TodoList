@@ -21,18 +21,35 @@ class UserControllerTest extends BaseWebTestCase
 
     public function testCreateUser()
     {
+        $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
+
+        $existingUser = $userRepository->findOneBy(['email' => 'testUser@test.fr']);
+        if ($existingUser) {
+            $em = $this->client->getContainer()->get('doctrine.orm.entity_manager');
+            $em->remove($existingUser);
+            $em->flush();
+        }
+
         $crawler = $this->client->request(Request::METHOD_GET, $this->generateUrl('user_create'));
+        $testUsername = 'User test username';
+        $plainPassword = 'password';
         $form = $crawler->selectButton('Ajouter')->form();
-        $form['user[username]'] = 'User test username';
-        $form['user[password][first]'] = 'password';
-        $form['user[password][second]'] = 'password';
+        $form['user[username]'] = $testUsername;
+        $form['user[password][first]'] = $plainPassword;
+        $form['user[password][second]'] = $plainPassword;
         $form['user[email]'] = 'testUser@test.fr';
 
         $this->client->submit($form);
         $this->assertEquals(Response::HTTP_FOUND, $this->client->getResponse()->getStatusCode());
         $crawler = $this->client->followRedirect();
         $this->assertStringContainsString('L\'utilisateur a bien été ajouté.', $crawler->filter('div.alert.alert-success')->text());
+        $user = $userRepository->findOneBy(['email' => 'testUser@test.fr']);
+        $this->assertNotNull($user);
+        $this->assertEquals($testUsername, $user->getUsername());
+        $passwordEncoder = $this->client->getContainer()->get('security.password_encoder');
+        $this->assertTrue($passwordEncoder->isPasswordValid($user, $plainPassword));
     }
+
 
     public function testMissingUsernameFieldCreateTask()
     {
