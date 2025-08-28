@@ -1,12 +1,17 @@
-.PHONY: tests reset-test-db
+.PHONY: test init-db test-fresh
 
-COMPOSE_TEST_FILES = -f compose.yaml -f compose.test.yaml
+COMPOSE_TEST_FILES = -f compose.yaml -f compose.override.yaml
 
-tests: reset-test-db
-	docker compose $(COMPOSE_TEST_FILES) run --rm php ./vendor/bin/phpunit
+# Reset the test database
+init-db:
+	docker compose $(COMPOSE_TEST_FILES) exec php bin/console doctrine:database:drop --force --env=test --if-exists
+	docker compose $(COMPOSE_TEST_FILES) exec php bin/console doctrine:database:create --env=test
+	docker compose $(COMPOSE_TEST_FILES) exec php bin/console doctrine:schema:update --force --env=test
+	docker compose $(COMPOSE_TEST_FILES) exec php bin/console doctrine:fixtures:load --no-interaction --env=test
 
-reset-test-db:
-	docker compose $(COMPOSE_TEST_FILES) run --rm php bin/console doctrine:database:drop --force --env=test --if-exists
-	docker compose $(COMPOSE_TEST_FILES) run --rm php bin/console doctrine:database:create --env=test
-	docker compose $(COMPOSE_TEST_FILES) run --rm php bin/console doctrine:schema:update --force --env=test
-	docker compose $(COMPOSE_TEST_FILES) run --rm php bin/console doctrine:fixtures:load --no-interaction --env=test
+# Run tests
+test:
+	docker compose $(COMPOSE_TEST_FILES) exec php ./vendor/bin/phpunit
+
+# Reset test db and run tests
+test-fresh: init-db test
