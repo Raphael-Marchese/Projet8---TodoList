@@ -88,7 +88,7 @@ class UserControllerTest extends BaseWebTestCase
     public function testEditUser()
     {
         $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
-        $user = $userRepository->findOneBy(['email' => 'testUser@test.fr']);
+        $user = $userRepository->findOneBy(['email' => 'user@test.fr']);
         $crawler = $this->client->request(Request::METHOD_GET, $this->generateUrl('user_edit', ['id' => $user->getId()]));
         $form = $crawler->selectButton('Modifier')->form();
         $form['user[username]'] = 'User test edit username';
@@ -96,7 +96,7 @@ class UserControllerTest extends BaseWebTestCase
         $this->assertEquals(Response::HTTP_FOUND, $this->client->getResponse()->getStatusCode());
         $crawler = $this->client->followRedirect();
         $this->assertStringContainsString('L\'utilisateur a bien été modifié', $crawler->filter('div.alert.alert-success')->text());
-        $user = $userRepository->findOneBy(['email' => 'testUser@test.fr']);
+        $user = $userRepository->findOneBy(['email' => 'user@test.fr']);
         $this->assertEquals('User test edit username', $user->getUsername());
     }
 }
