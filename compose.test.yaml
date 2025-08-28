@@ -2,9 +2,17 @@
 version: '3.8'
 
 services:
+  php:
+    depends_on:
+      - db_test
 
   db_test:
     image: mysql:5.7
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: symfony_test

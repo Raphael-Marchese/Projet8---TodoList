@@ -15,4 +15,5 @@
 /vendor/
 /web/bundles/
 /web/coverage/
+/web/second-coverage/
 .phpunit.result.cache
