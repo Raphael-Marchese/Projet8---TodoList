@@ -7,3 +7,11 @@ services:
 #    service_name:
 #        class: AppBundle\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
+
+  # Charge tout ce qui est dans DataFixtures/ comme service
+  AppBundle\DataFixtures\AppFixtures:
+    class: AppBundle\DataFixtures\AppFixtures
+    arguments:
+      - '@security.password_encoder'
+    tags:
+      - { name: doctrine.fixture.orm }

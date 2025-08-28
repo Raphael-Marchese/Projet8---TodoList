@@ -1,0 +1,15 @@
+# compose.test.yaml
+version: '3.8'
+
+services:
+
+  db_test:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: symfony_test
+    volumes:
+      - db-data-test:/var/lib/mysql
+
+volumes:
+  db-data-test:
