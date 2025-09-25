@@ -13,7 +13,7 @@
         <server name="APP_ENV" value="test" force="true" />
         <server name="SHELL_VERBOSITY" value="-1" />
         <server name="KERNEL_CLASS" value="App\Kernel" />
-        <server name="DATABASE_URL" value="mysql://root:root@db:3306/symfony" />
+        <server name="DATABASE_URL" value="mysql://root:root@db:3306/symfony_test" />
     </php>
 
     <testsuites>
