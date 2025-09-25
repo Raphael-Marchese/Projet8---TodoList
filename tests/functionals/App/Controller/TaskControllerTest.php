@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\functionals\AppBundle\Controller;
+namespace Tests\functionals\App\Controller;
 
-use AppBundle\Entity\Task;
+use App\Entity\Task;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\BaseWebTestCase;

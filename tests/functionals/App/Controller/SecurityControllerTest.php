@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\functionals\AppBundle\Controller;
+namespace Tests\functionals\App\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Tests\BaseWebTestCase;
@@ -14,8 +14,8 @@ class SecurityControllerTest extends BaseWebTestCase
         $crawler = $this->client->request('GET', $this->generateUrl('login'));
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $this->assertStringContainsString("_username", $crawler->filter('form')->html());;
-        $this->assertStringContainsString("_password", $crawler->filter('form')->html());;
+        $this->assertStringContainsString("_username", $crawler->filter('form')->html());
+        $this->assertStringContainsString("_password", $crawler->filter('form')->html());
     }
 
     public function testLoginLogoutSuccessful()

@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace AppBundle\DataFixtures;
+namespace App\DataFixtures;
 
-use AppBundle\Entity\Task;
-use AppBundle\Entity\User;
+use App\Entity\Task;
+use App\Entity\User;
+
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;

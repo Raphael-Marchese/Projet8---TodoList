@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\functionals\AppBundle\Controller;
+namespace Tests\functionals\App\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

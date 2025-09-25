@@ -22,5 +22,5 @@ doctrine:
         dbname: 'symfony_test'
 
 parameters:
-    database_host: db_test
+    database_host: db
 

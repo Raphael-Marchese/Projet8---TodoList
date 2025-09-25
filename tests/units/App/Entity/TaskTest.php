@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\units\AppBundle\Entity;
+namespace Tests\units\App\Entity;
 
-use AppBundle\Entity\Task;
+use App\Entity\Task;
 use DateTime;
 use PHPUnit\Framework\TestCase;
 

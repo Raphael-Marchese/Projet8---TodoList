@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\units\AppBundle\Entity;
+namespace Tests\units\App\Entity;
 
-use AppBundle\Entity\User;
+use App\Entity\User;
 use PHPUnit\Framework\TestCase;
 
 class UserTest extends TestCase

@@ -1,15 +1,19 @@
 security:
     encoders:
-        AppBundle\Entity\User: bcrypt
+        App\Entity\User: bcrypt
 
     providers:
         doctrine:
             entity:
-                class: AppBundle:User
+                class: App\Entity\User
                 property: username
 
     firewalls:
         dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        test:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
