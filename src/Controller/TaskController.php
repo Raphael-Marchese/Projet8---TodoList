@@ -62,8 +62,14 @@ class TaskController extends AbstractController
     /**
      * @Route("/tasks/{id}/edit", name="task_edit")
      */
-    public function editAction(Task $task, Request $request)
+    public function editAction(int $id, Request $request)
     {
+        $task = $this->doctrine->getRepository(Task::class)->find($id);
+
+        if (!$task) {
+            throw new RuntimeException('Task not found');
+        }
+
         $form = $this->createForm(TaskType::class, $task);
 
         $form->handleRequest($request);

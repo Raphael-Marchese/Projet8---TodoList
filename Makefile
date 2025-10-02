@@ -22,4 +22,4 @@ test:
 	docker compose $(COMPOSE_TEST_FILES) exec php ./vendor/bin/phpunit
 
 # Reset test db and run tests
-test-fresh: init-db test
+test-fresh: init-db-test test
