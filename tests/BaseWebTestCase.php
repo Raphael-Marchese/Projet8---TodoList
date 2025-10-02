@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests;
 
 use App\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -21,7 +20,7 @@ abstract class BaseWebTestCase extends WebTestCase
         $this->client = static::createClient();
     }
 
-    protected function createAuthenticatedClient(string $email = 'user@test.fr'): Client
+    protected function createAuthenticatedClient(string $email = 'user@test.fr')
     {
         $container = $this->client->getContainer();
 

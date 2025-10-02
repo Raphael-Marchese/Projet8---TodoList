@@ -46,8 +46,8 @@ class UserControllerTest extends BaseWebTestCase
         $user = $userRepository->findOneBy(['email' => 'testUser@test.fr']);
         $this->assertNotNull($user);
         $this->assertEquals($testUsername, $user->getUsername());
-        $passwordEncoder = $this->client->getContainer()->get('security.password_encoder');
-        $this->assertTrue($passwordEncoder->isPasswordValid($user, $plainPassword));
+        $passwordHasher = $this->client->getContainer()->get('security.user_password_hasher');
+        $this->assertTrue($passwordHasher->isPasswordValid($user, $plainPassword));
     }
 
 
