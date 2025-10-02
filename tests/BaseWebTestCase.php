@@ -5,37 +5,46 @@ declare(strict_types=1);
 namespace Tests;
 
 use App\Entity\User;
-use RuntimeException;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\BrowserKit\Cookie;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 abstract class BaseWebTestCase extends WebTestCase
 {
     protected $client = null;
 
     public function setUp(): void
-    {
-        self::ensureKernelShutdown();
 
+    {
         $this->client = static::createClient();
     }
 
-    protected function createAuthenticatedClient(string $email = 'user@test.fr'): KernelBrowser
+    protected function createAuthenticatedClient(string $email = 'user@test.fr')
     {
-        if ($this->client === null) {
-            $this->client = static::createClient();
-        }
+        $container = $this->client->getContainer();
 
-        $user = static::getContainer()
+        /** @var SessionInterface $session */
+        $session = $container->get('session');
+
+        /** @var User $user */
+        $user = $container
             ->get('doctrine')
             ->getRepository(User::class)
             ->findOneBy(['email' => $email]);
 
         if (!$user) {
-            throw new RuntimeException("Utilisateur avec l'email {$email} introuvable.");
+            throw new \Exception("Utilisateur avec l'email {$email} introuvable.");
         }
 
-        $this->client->loginUser($user);
+        $firewallName = 'main';
+
+        $token = new UsernamePasswordToken($user, null, $firewallName, $user->getRoles());
+        $session->set('_security_' . $firewallName, serialize($token));
+        $session->save();
+
+        $cookie = new Cookie($session->getName(), $session->getId());
+        $this->client->getCookieJar()->set($cookie);
 
         return $this->client;
     }
