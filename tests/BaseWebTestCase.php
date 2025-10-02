@@ -5,46 +5,45 @@ declare(strict_types=1);
 namespace Tests;
 
 use App\Entity\User;
+use RuntimeException;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\BrowserKit\Cookie;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 abstract class BaseWebTestCase extends WebTestCase
 {
     protected $client = null;
 
     public function setUp(): void
-
     {
-        $this->client = static::createClient();
+        self::ensureKernelShutdown();
+
+        $server = [
+            'HTTP_HOST' => 'localhost',
+            'SERVER_NAME' => 'localhost',
+            'HTTPS'       => 'on',
+            'HTTP_X_FORWARDED_PROTO' => 'https',
+        ];
+
+        $this->client = static::createClient([], $server);
+
     }
 
-    protected function createAuthenticatedClient(string $email = 'user@test.fr')
+    protected function createAuthenticatedClient(string $email = 'user@test.fr'): KernelBrowser
     {
-        $container = $this->client->getContainer();
+        if ($this->client === null) {
+            $this->client = static::createClient();
+        }
 
-        /** @var SessionInterface $session */
-        $session = $container->get('session');
-
-        /** @var User $user */
-        $user = $container
+        $user = static::getContainer()
             ->get('doctrine')
             ->getRepository(User::class)
             ->findOneBy(['email' => $email]);
 
         if (!$user) {
-            throw new \Exception("Utilisateur avec l'email {$email} introuvable.");
+            throw new RuntimeException("Utilisateur avec l'email {$email} introuvable.");
         }
 
-        $firewallName = 'main';
-
-        $token = new UsernamePasswordToken($user, null, $firewallName, $user->getRoles());
-        $session->set('_security_' . $firewallName, serialize($token));
-        $session->save();
-
-        $cookie = new Cookie($session->getName(), $session->getId());
-        $this->client->getCookieJar()->set($cookie);
+        $this->client->loginUser($user);
 
         return $this->client;
     }
