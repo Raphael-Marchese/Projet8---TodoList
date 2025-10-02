@@ -17,15 +17,7 @@ abstract class BaseWebTestCase extends WebTestCase
     {
         self::ensureKernelShutdown();
 
-        $server = [
-            'HTTP_HOST' => 'localhost',
-            'SERVER_NAME' => 'localhost',
-            'HTTPS'       => 'on',
-            'HTTP_X_FORWARDED_PROTO' => 'https',
-        ];
-
-        $this->client = static::createClient([], $server);
-
+        $this->client = static::createClient();
     }
 
     protected function createAuthenticatedClient(string $email = 'user@test.fr'): KernelBrowser
