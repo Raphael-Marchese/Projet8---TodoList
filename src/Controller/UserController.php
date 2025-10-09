@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\UserType;
 use Doctrine\Persistence\ManagerRegistry;
-use http\Exception\RuntimeException;
+use RuntimeException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,17 +24,13 @@ class UserController extends AbstractController
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * @Route("/users", name="user_list")
-     */
+    #[Route('/users', name: 'user_list')]
     public function listAction()
     {
         return $this->render('user/list.html.twig', ['users' => $this->doctrine->getRepository(User::class)->findAll()]);
     }
 
-    /**
-     * @Route("/users/create", name="user_create")
-     */
+    #[Route('/users/create', name: 'user_create')]
     public function createAction(Request $request)
     {
         $user = new User();
@@ -70,6 +66,7 @@ class UserController extends AbstractController
     /**
      * @Route("/users/{id}/edit", name="user_edit")
      */
+    #[Route('/users/{id}/edit', name: 'user_edit')]
     public function editAction(int $id, Request $request)
     {
         $user = $this->doctrine->getRepository(User::class)->find($id);
