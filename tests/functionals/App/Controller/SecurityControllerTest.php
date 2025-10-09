@@ -35,7 +35,6 @@ class SecurityControllerTest extends BaseWebTestCase
         $logoutLink = $crawler->selectLink('Se déconnecter');
 
         $this->client->click($logoutLink->link());;
-
         $crawler = $this->client->followRedirect();
 
         $this->assertStringContainsString('Bienvenue sur Todo List', $crawler->filter('h1')->text());

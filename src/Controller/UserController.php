@@ -4,20 +4,24 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserType;
+use Doctrine\Persistence\ManagerRegistry;
+use http\Exception\RuntimeException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserController extends AbstractController
 {
 
-    private $passwordEncoder;
+    private $hasher;
+    private $doctrine;
 
-    public function __construct(UserPasswordEncoderInterface $passwordEncoder)
+    public function __construct(UserPasswordHasherInterface $hasher, ManagerRegistry $doctrine)
     {
-        $this->passwordEncoder = $passwordEncoder;
+        $this->hasher = $hasher;
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -25,7 +29,7 @@ class UserController extends AbstractController
      */
     public function listAction()
     {
-        return $this->render('user/list.html.twig', ['users' => $this->getDoctrine()->getRepository(User::class)->findAll()]);
+        return $this->render('user/list.html.twig', ['users' => $this->doctrine->getRepository(User::class)->findAll()]);
     }
 
     /**
@@ -39,10 +43,13 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $password = $this->passwordEncoder->encodePassword($user, $user->getPassword());
-            $user->setPassword($password);
+            $em = $this->doctrine->getManager();
 
+            $password = $form->get('password')->getData();
+
+            if ($password) {
+                $user->setPassword($this->hasher->hashPassword($user, $password));
+            }
             $em->persist($user);
             $em->flush();
 
@@ -63,17 +70,28 @@ class UserController extends AbstractController
     /**
      * @Route("/users/{id}/edit", name="user_edit")
      */
-    public function editAction(User $user, Request $request)
+    public function editAction(int $id, Request $request)
     {
-        $form = $this->createForm(UserType::class, $user);
+        $user = $this->doctrine->getRepository(User::class)->find($id);
+
+        if (!$user) {
+            throw new RuntimeException('User not found');
+        }
+
+        $form = $this->createForm(UserType::class, $user, ['is_edit' => true]);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $password = $this->passwordEncoder->encodePassword($user, $user->getPassword());
-            $user->setPassword($password);
+            $password = $form->get('password')->getData();
 
-            $this->getDoctrine()->getManager()->flush();
+            if ($password) {
+                $user->setPassword($this->hasher->hashPassword($user, $password));
+            }
+
+            $this->doctrine->getManager()->persist($user);
+
+            $this->doctrine->getManager()->flush();
 
             $this->addFlash('success', "L'utilisateur a bien été modifié");
 
