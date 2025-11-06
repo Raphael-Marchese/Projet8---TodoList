@@ -9,7 +9,7 @@ use Tests\BaseWebTestCase;
 
 class SecurityControllerTest extends BaseWebTestCase
 {
-    public function testGetLoginPage()
+    public function testGetLoginPage(): void
     {
         $crawler = $this->client->request('GET', $this->generateUrl('login'));
 
@@ -18,7 +18,7 @@ class SecurityControllerTest extends BaseWebTestCase
         $this->assertStringContainsString("_password", $crawler->filter('form')->html());
     }
 
-    public function testLoginLogoutSuccessful()
+    public function testLoginLogoutSuccessful():void
     {
         $crawler = $this->client->request('GET', '/login');
 
@@ -26,6 +26,7 @@ class SecurityControllerTest extends BaseWebTestCase
         $form['_username'] = 'user';
         $form['_password'] = 'password';
         $this->client->submit($form);
+
 
         $crawler = $this->client->followRedirect();
 

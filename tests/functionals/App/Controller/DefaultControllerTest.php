@@ -8,7 +8,7 @@ use Tests\BaseWebTestCase;
 
 class DefaultControllerTest extends BaseWebTestCase
 {
-    public function testIndex()
+    public function testIndex(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/');
 
