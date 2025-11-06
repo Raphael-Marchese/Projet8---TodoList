@@ -31,6 +31,13 @@ class TaskControllerTest extends BaseWebTestCase
         $this->assertEquals(Response::HTTP_FOUND, $client->getResponse()->getStatusCode());
         $crawler = $client->followRedirect();
         $this->assertStringContainsString('La tâche a été bien été ajoutée.', $crawler->filter('div.alert.alert-success')->text());
+
+        //Check if new task has a linked user
+
+        $taskRepository = $client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
+        $task = $taskRepository->findOneBy(['title' => 'Task test title']);
+        $this->assertNotNull($task->author);
+
     }
 
     public function testMissingTitleFieldCreateTask()

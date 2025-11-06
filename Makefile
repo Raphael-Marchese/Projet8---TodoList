@@ -8,6 +8,8 @@ init-db:
 	docker compose $(COMPOSE_TEST_FILES) exec php bin/console doctrine:database:create
 	docker compose $(COMPOSE_TEST_FILES) exec php bin/console doctrine:schema:update --force
 	docker compose $(COMPOSE_TEST_FILES) exec php bin/console doctrine:fixtures:load --no-interaction
+	docker compose $(COMPOSE_TEST_FILES) exec php bin/console doctrine:migrations:migrate
+
 
 # Reset the test database
 init-db-test:

@@ -37,6 +37,10 @@ class Task
     #[ORM\Column(type: 'boolean')]
     private $isDone;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    public ?User $author = null;
+
     public function __construct()
     {
         $this->createdAt = new \Datetime();
