@@ -28,7 +28,7 @@
     "symfony/asset": "^7.3",
     "symfony/form": "^7.3",
     "symfony/mailer": "^7.3",
-        "doctrine/doctrine-migrations-bundle": "^3.5"
+    "doctrine/doctrine-migrations-bundle": "^3.5"
   },
   "require-dev": {
     "symfony/phpunit-bridge": "^7.3",

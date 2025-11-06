@@ -46,6 +46,10 @@ class UserController extends AbstractController
             if ($password) {
                 $user->setPassword($this->hasher->hashPassword($user, $password));
             }
+
+            $role = $form->get('roles')->getData();
+            $user->setRoles([$role]);
+
             $em->persist($user);
             $em->flush();
 
@@ -85,6 +89,9 @@ class UserController extends AbstractController
             if ($password) {
                 $user->setPassword($this->hasher->hashPassword($user, $password));
             }
+
+            $role = $form->get('roles')->getData();
+            $user->setRoles([$role]);
 
             $this->doctrine->getManager()->persist($user);
 

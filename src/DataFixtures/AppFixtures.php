@@ -34,6 +34,15 @@ class AppFixtures extends Fixture
         $testUser->setPassword($test_password);
         $manager->persist($testUser);
 
+        $admin = new User;
+        $admin->setEmail('admin@test.fr');
+        $admin->setUsername('admin');
+        $admin_password = $this->hasher->hashPassword($admin, 'admin');
+        $admin->setPassword($admin_password);
+        $admin->setRoles(['ROLE_ADMIN']);
+        $manager->persist($admin);
+        $manager->flush();
+
         $task = new Task;
         $task->setTitle('Test task');
         $task->setContent('Test content');

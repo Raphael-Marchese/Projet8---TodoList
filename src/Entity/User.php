@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -29,6 +30,9 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
     #[Assert\NotBlank(message: "Vous devez saisir une adresse email.")]
     #[Assert\Email(message: "Le format de l'adresse n'est pas correcte.")]
     private string $email;
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $roles = null;
 
     public function getId(): int
     {
@@ -70,10 +74,7 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
         $this->email = $email;
     }
 
-    public function getRoles(): array
-    {
-        return ['ROLE_USER'];
-    }
+
 
     #[\Deprecated]
     public function eraseCredentials(): void
@@ -83,5 +84,17 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
     public function getUserIdentifier(): string
     {
         return $this->username;
+    }
+
+    public function getRoles(): array
+    {
+        return $this->roles;
+    }
+
+    public function setRoles(?array $roles): static
+    {
+        $this->roles = $roles;
+
+        return $this;
     }
 }
