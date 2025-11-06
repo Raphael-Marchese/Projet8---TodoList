@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Task;
+use App\Entity\User;
 use App\Form\TaskType;
 use Doctrine\Persistence\ManagerRegistry;
 use RuntimeException;
@@ -10,6 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class TaskController extends AbstractController
 {
@@ -30,7 +32,7 @@ class TaskController extends AbstractController
     }
 
     #[Route('/tasks/create', name: 'task_create')]
-    public function createAction(Request $request)
+    public function createAction(Request $request, #[CurrentUser] ?User $user)
     {
         $task = new Task();
         $form = $this->createForm(TaskType::class, $task);
@@ -39,7 +41,7 @@ class TaskController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->doctrine->getManager();
-
+            $task->author = $user;
             $em->persist($task);
             $em->flush();
 
