@@ -75,6 +75,7 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
         return ['ROLE_USER'];
     }
 
+    #[\Deprecated]
     public function eraseCredentials(): void
     {
     }

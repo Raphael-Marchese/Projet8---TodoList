@@ -10,6 +10,8 @@ framework:
         cookie_samesite: lax
         cookie_secure: auto
         handler_id: session.handler.native_file
+    profiler:
+      collect_serializer_data: true
     #esi: true
     #fragments: true
     php_errors:
