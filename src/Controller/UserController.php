@@ -46,6 +46,10 @@ class UserController extends AbstractController
             if ($password) {
                 $user->setPassword($this->hasher->hashPassword($user, $password));
             }
+
+            $role = $form->get('roles')->getData();
+            $user->setRoles([$role]);
+
             $em->persist($user);
             $em->flush();
 
@@ -77,6 +81,9 @@ class UserController extends AbstractController
 
         $form = $this->createForm(UserType::class, $user, ['is_edit' => true]);
 
+        $currentRole = $user->getRoles()[0] ?? 'ROLE_USER';
+        $form->get('roles')->setData($currentRole);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -85,6 +92,9 @@ class UserController extends AbstractController
             if ($password) {
                 $user->setPassword($this->hasher->hashPassword($user, $password));
             }
+
+            $role = $form->get('roles')->getData();
+            $user->setRoles([$role]);
 
             $this->doctrine->getManager()->persist($user);
 

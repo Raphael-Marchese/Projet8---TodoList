@@ -17,6 +17,8 @@ init-db-test:
 	docker compose $(COMPOSE_TEST_FILES) exec db sh -c "mysql -uroot -proot -e 'CREATE DATABASE IF NOT EXISTS symfony_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'"
 	docker compose $(COMPOSE_TEST_FILES) exec php sh -c "APP_ENV=test DATABASE_URL='mysql://root:root@db:3306/symfony_test' bin/console doctrine:schema:update --force --env=test"
 	docker compose $(COMPOSE_TEST_FILES) exec php sh -c "APP_ENV=test DATABASE_URL='mysql://root:root@db:3306/symfony_test' bin/console doctrine:fixtures:load --no-interaction --env=test"
+	docker compose $(COMPOSE_TEST_FILES) exec php sh -c "APP_ENV=test DATABASE_URL='mysql://root:root@db:3306/symfony_test' bin/console doctrine:migrations:migrate --no-interaction --env=test"
+
 
 # Run tests
 test:

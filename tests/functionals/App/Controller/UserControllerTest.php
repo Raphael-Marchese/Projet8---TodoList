@@ -11,88 +11,123 @@ use Tests\BaseWebTestCase;
 
 class UserControllerTest extends BaseWebTestCase
 {
-    public function testGetList()
+    public function testGetListDenied()
     {
         $client = $this->createAuthenticatedClient();
         $crawler = $client->request(Request::METHOD_GET, $this->generateUrl('user_list'));
 
-        $this->assertEquals(Response::HTTP_OK, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
+    }
+
+    public function testGetListByAdmin()
+    {
+        $admin = $this->createAuthenticatedClient('admin@test.fr');
+        $crawler = $admin->request(Request::METHOD_GET, $this->generateUrl('user_list'));
+
+        $this->assertEquals(Response::HTTP_OK, $admin->getResponse()->getStatusCode());
         $this->assertStringContainsString('Liste des utilisateurs', $crawler->filter('h1')->text());
     }
 
-    public function testCreateUser()
+
+    public function testCreateUserDenied()
     {
         $client = $this->createAuthenticatedClient();
-        $userRepository = $client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
+        $client->request(Request::METHOD_GET, $this->generateUrl('user_create'));
+
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
+
+    }
+    public function testCreateUser()
+    {
+        $admin = $this->createAuthenticatedClient('admin@test.fr');
+        $userRepository = $admin->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
 
         $existingUser = $userRepository->findOneBy(['email' => 'testUser@test.fr']);
         if ($existingUser) {
-            $em = $client->getContainer()->get('doctrine.orm.entity_manager');
+            $em = $admin->getContainer()->get('doctrine.orm.entity_manager');
             $em->remove($existingUser);
             $em->flush();
         }
 
-        $crawler = $client->request(Request::METHOD_GET, $this->generateUrl('user_create'));
+        $crawler = $admin->request(Request::METHOD_GET, $this->generateUrl('user_create'));
+
         $testUsername = 'User test username';
         $plainPassword = 'password';
+        $roles = 'ROLE_USER';
         $form = $crawler->selectButton('Ajouter')->form();
         $form['user[username]'] = $testUsername;
         $form['user[password][first]'] = $plainPassword;
         $form['user[password][second]'] = $plainPassword;
         $form['user[email]'] = 'testUser@test.fr';
+        $form['user[roles]'] = $roles;
 
-        $client->submit($form);
-        $this->assertEquals(Response::HTTP_FOUND, $client->getResponse()->getStatusCode());
-        $crawler = $client->followRedirect();
+        $admin->submit($form);
+        $this->assertEquals(Response::HTTP_FOUND, $admin->getResponse()->getStatusCode());
+        $crawler = $admin->followRedirect();
         $this->assertStringContainsString('L\'utilisateur a bien été ajouté.', $crawler->filter('div.alert.alert-success')->text());
         $user = $userRepository->findOneBy(['email' => 'testUser@test.fr']);
         $this->assertNotNull($user);
         $this->assertEquals($testUsername, $user->getUsername());
-        $passwordHasher = $client->getContainer()->get('security.user_password_hasher');
+        $passwordHasher = $admin->getContainer()->get('security.user_password_hasher');
         $this->assertTrue($passwordHasher->isPasswordValid($user, $plainPassword));
     }
 
 
     public function testMissingUsernameFieldCreateTask()
     {
-        $client = $this->createAuthenticatedClient();
+        $client = $this->createAuthenticatedClient('admin@test.fr');
         $crawler = $client->request(Request::METHOD_GET, $this->generateUrl('user_create'));
+
         $form = $crawler->selectButton('Ajouter')->form();
         $form['user[password][first]'] = 'password';
         $form['user[password][second]'] = 'password';
         $form['user[email]'] = 'testUser@test.fr';
+        $form['user[roles]'] = 'ROLE_USER';
+
         $client->submit($form);
         $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $client->getResponse()->getStatusCode());
     }
 
     public function testMissingEmailFieldCreateTask()
     {
-        $client = $this->createAuthenticatedClient();
+        $client = $this->createAuthenticatedClient('admin@test.fr');
         $crawler = $client->request(Request::METHOD_GET, $this->generateUrl('user_create'));
+
         $form = $crawler->selectButton('Ajouter')->form();
         $form['user[username]'] = 'User test username';
         $form['user[password][first]'] = 'password';
         $form['user[password][second]'] = 'password';
+        $form['user[roles]'] = 'ROLE_USER';
+
         $client->submit($form);
         $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $client->getResponse()->getStatusCode());
     }
 
     public function testDifferentPasswordsFieldCreateTask()
     {
-        $client = $this->createAuthenticatedClient();
+        $client = $this->createAuthenticatedClient('admin@test.fr');
         $crawler = $client->request(Request::METHOD_GET, $this->generateUrl('user_create'));
+
         $form = $crawler->selectButton('Ajouter')->form();
         $form['user[username]'] = 'User test username';
         $form['user[password][first]'] = 'password';
         $form['user[password][second]'] = 'password1';
         $form['user[email]'] = 'testUser2@test.fr';
+        $form['user[roles]'] = 'ROLE_USER';
+
         $client->submit($form);
         $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $client->getResponse()->getStatusCode());
     }
 
-    public function testEditUser()
+    public function testEditUserDenied()
     {
         $client = $this->createAuthenticatedClient();
+        $client->request(Request::METHOD_GET, $this->generateUrl('user_edit', ['id' => 1]));
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
+    }
+    public function testEditUser()
+    {
+        $client = $this->createAuthenticatedClient('admin@test.fr');
         $userRepository = $client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
         $user = $userRepository->findOneBy(['email' => 'user@test.fr']);
         $crawler = $client->request(Request::METHOD_GET, $this->generateUrl('user_edit', ['id' => $user->getId()]));

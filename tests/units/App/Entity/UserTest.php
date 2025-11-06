@@ -14,6 +14,7 @@ class UserTest extends TestCase
         $user->setUsername('Test username');
         $user->setEmail('email@test.fr');
         $user->setPassword('testPassword');
+        $user->setRoles(['ROLE_USER']);
         $this->assertEquals('Test username', $user->getUsername());;
         $this->assertEquals('email@test.fr', $user->getEmail());
         $this->assertEquals('testPassword', $user->getPassword());
