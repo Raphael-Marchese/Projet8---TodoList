@@ -11,7 +11,7 @@ use Tests\BaseWebTestCase;
 
 class UserControllerTest extends BaseWebTestCase
 {
-    public function testGetListDenied()
+    public function testGetListDenied(): void
     {
         $client = $this->createAuthenticatedClient();
         $crawler = $client->request(Request::METHOD_GET, $this->generateUrl('user_list'));
@@ -19,7 +19,7 @@ class UserControllerTest extends BaseWebTestCase
         $this->assertEquals(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
     }
 
-    public function testGetListByAdmin()
+    public function testGetListByAdmin(): void
     {
         $admin = $this->createAuthenticatedClient('admin@test.fr');
         $crawler = $admin->request(Request::METHOD_GET, $this->generateUrl('user_list'));
@@ -29,15 +29,15 @@ class UserControllerTest extends BaseWebTestCase
     }
 
 
-    public function testCreateUserDenied()
+    public function testCreateUserDenied(): void
     {
         $client = $this->createAuthenticatedClient();
         $client->request(Request::METHOD_GET, $this->generateUrl('user_create'));
 
         $this->assertEquals(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
-
     }
-    public function testCreateUser()
+
+    public function testCreateUser(): void
     {
         $admin = $this->createAuthenticatedClient('admin@test.fr');
         $userRepository = $admin->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
@@ -64,7 +64,10 @@ class UserControllerTest extends BaseWebTestCase
         $admin->submit($form);
         $this->assertEquals(Response::HTTP_FOUND, $admin->getResponse()->getStatusCode());
         $crawler = $admin->followRedirect();
-        $this->assertStringContainsString('L\'utilisateur a bien été ajouté.', $crawler->filter('div.alert.alert-success')->text());
+        $this->assertStringContainsString(
+            'L\'utilisateur a bien été ajouté.',
+            $crawler->filter('div.alert.alert-success')->text()
+        );
         $user = $userRepository->findOneBy(['email' => 'testUser@test.fr']);
         $this->assertNotNull($user);
         $this->assertEquals($testUsername, $user->getUsername());
@@ -73,7 +76,7 @@ class UserControllerTest extends BaseWebTestCase
     }
 
 
-    public function testMissingUsernameFieldCreateTask()
+    public function testMissingUsernameFieldCreateTask(): void
     {
         $client = $this->createAuthenticatedClient('admin@test.fr');
         $crawler = $client->request(Request::METHOD_GET, $this->generateUrl('user_create'));
@@ -88,7 +91,7 @@ class UserControllerTest extends BaseWebTestCase
         $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $client->getResponse()->getStatusCode());
     }
 
-    public function testMissingEmailFieldCreateTask()
+    public function testMissingEmailFieldCreateTask(): void
     {
         $client = $this->createAuthenticatedClient('admin@test.fr');
         $crawler = $client->request(Request::METHOD_GET, $this->generateUrl('user_create'));
@@ -103,7 +106,7 @@ class UserControllerTest extends BaseWebTestCase
         $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $client->getResponse()->getStatusCode());
     }
 
-    public function testDifferentPasswordsFieldCreateTask()
+    public function testDifferentPasswordsFieldCreateTask(): void
     {
         $client = $this->createAuthenticatedClient('admin@test.fr');
         $crawler = $client->request(Request::METHOD_GET, $this->generateUrl('user_create'));
@@ -119,13 +122,14 @@ class UserControllerTest extends BaseWebTestCase
         $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $client->getResponse()->getStatusCode());
     }
 
-    public function testEditUserDenied()
+    public function testEditUserDenied(): void
     {
         $client = $this->createAuthenticatedClient();
         $client->request(Request::METHOD_GET, $this->generateUrl('user_edit', ['id' => 1]));
         $this->assertEquals(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
     }
-    public function testEditUser()
+
+    public function testEditUser(): void
     {
         $client = $this->createAuthenticatedClient('admin@test.fr');
         $userRepository = $client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
@@ -133,10 +137,15 @@ class UserControllerTest extends BaseWebTestCase
         $crawler = $client->request(Request::METHOD_GET, $this->generateUrl('user_edit', ['id' => $user->getId()]));
         $form = $crawler->selectButton('Modifier')->form();
         $form['user[username]'] = 'User test edit username';
+        $form['user[password][first]'] = 'password1';
+        $form['user[password][second]'] = 'password1';
         $client->submit($form);
         $this->assertEquals(Response::HTTP_FOUND, $client->getResponse()->getStatusCode());
         $crawler = $client->followRedirect();
-        $this->assertStringContainsString('L\'utilisateur a bien été modifié', $crawler->filter('div.alert.alert-success')->text());
+        $this->assertStringContainsString(
+            'L\'utilisateur a bien été modifié',
+            $crawler->filter('div.alert.alert-success')->text()
+        );
         $user = $userRepository->findOneBy(['email' => 'user@test.fr']);
         $this->assertEquals('User test edit username', $user->getUsername());
     }
