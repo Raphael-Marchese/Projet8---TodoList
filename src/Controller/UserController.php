@@ -17,6 +17,7 @@ class UserController extends AbstractController
 {
 
     private $hasher;
+
     private $doctrine;
 
     public function __construct(UserPasswordHasherInterface $hasher, ManagerRegistry $doctrine)
@@ -28,7 +29,8 @@ class UserController extends AbstractController
     #[Route('/users', name: 'user_list')]
     public function listAction(): Response
     {
-        return $this->render('user/list.html.twig', ['users' => $this->doctrine->getRepository(User::class)->findAll()]);
+        return $this->render('user/list.html.twig', ['users' => $this->doctrine->getRepository(User::class)->findAll()]
+        );
     }
 
     #[Route('/users/create', name: 'user_create')]

@@ -18,7 +18,7 @@ class SecurityControllerTest extends BaseWebTestCase
         $this->assertStringContainsString("_password", $crawler->filter('form')->html());
     }
 
-    public function testLoginLogoutSuccessful():void
+    public function testLoginLogoutSuccessful(): void
     {
         $crawler = $this->client->request('GET', '/login');
 
@@ -42,7 +42,7 @@ class SecurityControllerTest extends BaseWebTestCase
         $this->assertStringContainsString('Se connecter', $crawler->filter('.btn-success')->text());
     }
 
-    public function testLoginWithBadCredentials()
+    public function testLoginWithBadCredentials(): void
     {
         $crawler = $this->client->request('GET', '/login');
 

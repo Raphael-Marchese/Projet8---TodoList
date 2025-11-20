@@ -11,7 +11,7 @@ use Tests\BaseWebTestCase;
 
 class TaskControllerTest extends BaseWebTestCase
 {
-    public function testGetList()
+    public function testGetList(): void
     {
         $client = $this->createAuthenticatedClient();
         $crawler = $client->request(Request::METHOD_GET, $this->generateUrl('task_list'));
@@ -20,7 +20,7 @@ class TaskControllerTest extends BaseWebTestCase
         $this->assertStringContainsString('Créer une tâche', $crawler->filter('.create-task-btn')->text());
     }
 
-    public function testCreateTask()
+    public function testCreateTask(): void
     {
         $client = $this->createAuthenticatedClient();
         $crawler = $client->request(Request::METHOD_GET, $this->generateUrl('task_create'));
@@ -30,17 +30,19 @@ class TaskControllerTest extends BaseWebTestCase
         $client->submit($form);
         $this->assertEquals(Response::HTTP_FOUND, $client->getResponse()->getStatusCode());
         $crawler = $client->followRedirect();
-        $this->assertStringContainsString('La tâche a été bien été ajoutée.', $crawler->filter('div.alert.alert-success')->text());
+        $this->assertStringContainsString(
+            'La tâche a été bien été ajoutée.',
+            $crawler->filter('div.alert.alert-success')->text()
+        );
 
         //Check if new task has a linked user
 
         $taskRepository = $client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
         $task = $taskRepository->findOneBy(['title' => 'Task test title']);
         $this->assertNotNull($task->author);
-
     }
 
-    public function testMissingTitleFieldCreateTask()
+    public function testMissingTitleFieldCreateTask(): void
     {
         $client = $this->createAuthenticatedClient();
         $crawler = $client->request(Request::METHOD_GET, $this->generateUrl('task_create'));
@@ -50,7 +52,7 @@ class TaskControllerTest extends BaseWebTestCase
         $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $client->getResponse()->getStatusCode());
     }
 
-    public function testMissingContentFieldCreateTask()
+    public function testMissingContentFieldCreateTask(): void
     {
         $client = $this->createAuthenticatedClient();
         $crawler = $client->request(Request::METHOD_GET, $this->generateUrl('task_create'));
@@ -60,7 +62,7 @@ class TaskControllerTest extends BaseWebTestCase
         $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $client->getResponse()->getStatusCode());
     }
 
-    public function testEditTask()
+    public function testEditTask(): void
     {
         $client = $this->createAuthenticatedClient();
         $taskRepository = $client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
@@ -72,39 +74,94 @@ class TaskControllerTest extends BaseWebTestCase
         $client->submit($form);
         $this->assertEquals(Response::HTTP_FOUND, $client->getResponse()->getStatusCode());
         $crawler = $client->followRedirect();
-        $this->assertStringContainsString('La tâche a bien été modifiée.', $crawler->filter('div.alert.alert-success')->text());
+        $this->assertStringContainsString(
+            'La tâche a bien été modifiée.',
+            $crawler->filter('div.alert.alert-success')->text()
+        );
     }
 
-    public function testToggleNotDoneTask()
+    public function testToggleNotDoneTask(): void
     {
         $client = $this->createAuthenticatedClient();
         $taskRepository = $client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
         $task = $taskRepository->findOneBy(['isDone' => false]);
         $client->request(Request::METHOD_GET, $this->generateUrl('task_toggle', ['id' => $task->getId()]));
         $crawler = $client->followRedirect();
-        $this->assertStringContainsString(sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle()), $crawler->filter('div.alert.alert-success')->text());
+        $this->assertStringContainsString(
+            sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle()),
+            $crawler->filter('div.alert.alert-success')->text()
+        );
     }
-    public function testToggleDoneTask()
+
+    public function testToggleDoneTask(): void
     {
         $client = $this->createAuthenticatedClient();
         $taskRepository = $client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
         $task = $taskRepository->findOneBy(['isDone' => true]);
         $client->request(Request::METHOD_GET, $this->generateUrl('task_toggle', ['id' => $task->getId()]));
         $crawler = $client->followRedirect();
-        $this->assertStringContainsString(sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle()), $crawler->filter('div.alert.alert-success')->text());
+        $this->assertStringContainsString(
+            sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle()),
+            $crawler->filter('div.alert.alert-success')->text()
+        );
     }
 
-    public function testDeleteTask()
+    public function testDeleteTaskByAuthorUserSuccess(): void
     {
         $client = $this->createAuthenticatedClient();
         $taskRepository = $client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
         $task = $taskRepository->findOneBy(['title' => 'Task test edit title']);
-        if(null === $task)
-        {
+        if (null === $task) {
             $task = $taskRepository->findOneBy(['title' => 'Task test title']);
         }
         $client->request(Request::METHOD_GET, $this->generateUrl('task_delete', ['id' => $task->getId()]));
         $crawler = $client->followRedirect();
-        $this->assertStringContainsString('La tâche a bien été supprimée.', $crawler->filter('div.alert.alert-success')->text());
+        $this->assertStringContainsString(
+            'La tâche a bien été supprimée.',
+            $crawler->filter('div.alert.alert-success')->text()
+        );
+    }
+
+    public function testDeleteTaskByNonConnectedUserDenied(): void
+    {
+        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
+        $task = $taskRepository->findOneBy(['title' => 'Test task']);
+        $this->client->request(Request::METHOD_GET, $this->generateUrl('task_delete', ['id' => $task->getId()]));
+        $this->assertEquals(Response::HTTP_FOUND, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString('/login', $this->client->getResponse()->headers->get('location'));
+    }
+
+    public function testDeleteNonAuthorTaskByUserDenied(): void
+    {
+        $client = $this->createAuthenticatedClient();
+        $taskRepository = $client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
+        $task = $taskRepository->findOneBy(['title' => 'Test task']);
+        $client->request(Request::METHOD_GET, $this->generateUrl('task_delete', ['id' => $task->getId()]));
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
+        $this->assertStringContainsString(
+            'Vous n\'avez pas la permission de supprimer cette tâche. Veuillez contacter un administrateur.',
+            $client->getResponse()->getContent()
+        );
+    }
+
+    public function testDeleteTaskNotExisting(): void
+    {
+        $client = $this->createAuthenticatedClient();
+        $client->request(Request::METHOD_GET, $this->generateUrl('task_delete', ['id' => 100]));
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $client->getResponse()->getStatusCode());
+    }
+
+    public function testDeleteNonAuthorTaskByAdminSuccess(): void
+    {
+        $client = $this->createAuthenticatedClient('admin@test.fr');
+        $taskRepository = $client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
+        $task = $taskRepository->findOneBy(['title' => 'Test task']);
+        $client->request(Request::METHOD_GET, $this->generateUrl('task_delete', ['id' => $task->getId()]));
+        $this->assertEquals(Response::HTTP_FOUND, $client->getResponse()->getStatusCode());
+        $crawler = $this->client->followRedirect();
+        $this->assertStringContainsString(
+            'Superbe ! La tâche a bien été supprimée.',
+            $crawler->filter('div.alert.alert-success')->text()
+        );
     }
 }
