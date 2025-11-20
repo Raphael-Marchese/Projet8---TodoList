@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Form\UserType;
 use Doctrine\Persistence\ManagerRegistry;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,13 +26,13 @@ class UserController extends AbstractController
     }
 
     #[Route('/users', name: 'user_list')]
-    public function listAction()
+    public function listAction(): Response
     {
         return $this->render('user/list.html.twig', ['users' => $this->doctrine->getRepository(User::class)->findAll()]);
     }
 
     #[Route('/users/create', name: 'user_create')]
-    public function createAction(Request $request)
+    public function createAction(Request $request): RedirectResponse|Response
     {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
@@ -71,14 +72,8 @@ class UserController extends AbstractController
      * @Route("/users/{id}/edit", name="user_edit")
      */
     #[Route('/users/{id}/edit', name: 'user_edit')]
-    public function editAction(int $id, Request $request)
+    public function editAction(User $user, Request $request): RedirectResponse|Response
     {
-        $user = $this->doctrine->getRepository(User::class)->find($id);
-
-        if (!$user) {
-            throw new RuntimeException('User not found');
-        }
-
         $form = $this->createForm(UserType::class, $user, ['is_edit' => true]);
 
         $currentRole = $user->getRoles()[0] ?? 'ROLE_USER';
