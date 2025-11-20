@@ -6,12 +6,13 @@ use App\Entity\Task;
 use App\Entity\User;
 use App\Form\TaskType;
 use Doctrine\Persistence\ManagerRegistry;
-use RuntimeException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class TaskController extends AbstractController
 {
@@ -23,7 +24,7 @@ class TaskController extends AbstractController
     }
 
     #[Route('/tasks', name: 'task_list')]
-    public function listAction()
+    public function listAction(): Response
     {
         return $this->render(
             'task/list.html.twig',
@@ -32,7 +33,7 @@ class TaskController extends AbstractController
     }
 
     #[Route('/tasks/create', name: 'task_create')]
-    public function createAction(Request $request, #[CurrentUser] ?User $user)
+    public function createAction(Request $request, #[CurrentUser] ?User $user): RedirectResponse|Response
     {
         $task = new Task();
         $form = $this->createForm(TaskType::class, $task);
@@ -58,14 +59,8 @@ class TaskController extends AbstractController
     }
 
     #[Route('/tasks/{id}/edit', name: 'task_edit')]
-    public function editAction(int $id, Request $request)
+    public function editAction(Task $task, Request $request): RedirectResponse|Response
     {
-        $task = $this->doctrine->getRepository(Task::class)->find($id);
-
-        if (!$task) {
-            throw new RuntimeException('Task not found');
-        }
-
         $form = $this->createForm(TaskType::class, $task);
 
         $form->handleRequest($request);
@@ -85,14 +80,8 @@ class TaskController extends AbstractController
     }
 
     #[Route('/tasks/{id}/toggle', name: 'task_toggle')]
-    public function toggleTaskAction(int $id)
+    public function toggleTaskAction(Task $task): RedirectResponse
     {
-        $task = $this->doctrine->getRepository(Task::class)->find($id);
-
-        if (!$task) {
-            throw new RuntimeException('Task not found');
-        }
-
         $task->toggle(!$task->isDone());
         $this->doctrine->getManager()->persist($task);
         $this->doctrine->getManager()->flush();
@@ -103,14 +92,9 @@ class TaskController extends AbstractController
     }
 
     #[Route('/tasks/{id}/delete', name: 'task_delete')]
-    public function deleteTaskAction(int $id)
+    #[IsGranted('delete', 'task')]
+    public function deleteTaskAction(Task $task): RedirectResponse
     {
-        $task = $this->doctrine->getRepository(Task::class)->find($id);
-
-        if (!$task) {
-            throw new RuntimeException('Task not found');
-        }
-
         $em = $this->doctrine->getManager();
         $em->remove($task);
         $em->flush();
