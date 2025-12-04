@@ -44,7 +44,7 @@ class DeleteTaskVoter extends Voter
 
         if (!$user instanceof User) {
             // the user must be logged in; if not, deny access
-            $vote?->addReason('The user is not logged in.');
+            $vote?->addReason('L\'utilisateur n\'est pas connecté');
             return false;
         }
 
@@ -59,7 +59,7 @@ class DeleteTaskVoter extends Voter
             return true;
         }
 
-        $vote?->addReason('You don\'t have permission to delete this task. Please contact an administrator.');
+        $vote?->addReason('Vous n\'avez pas la permission de supprimer cette tâche. Veuillez contacter un administrateur.');
 
         return false;
     }
