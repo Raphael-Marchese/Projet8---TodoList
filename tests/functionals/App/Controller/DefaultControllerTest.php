@@ -13,6 +13,6 @@ class DefaultControllerTest extends BaseWebTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/');
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $this->assertStringContainsString('Bienvenue sur Todo List', $crawler->filter('h1')->text());
+        $this->assertStringContainsString('Bienvenue sur To Do List', $crawler->filter('h1')->text());
     }
 }

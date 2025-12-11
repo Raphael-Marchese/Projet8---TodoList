@@ -5,19 +5,28 @@ declare(strict_types=1);
 namespace Tests\functionals\App\Controller;
 
 use App\Entity\Task;
+use App\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\BaseWebTestCase;
 
 class TaskControllerTest extends BaseWebTestCase
 {
-    public function testGetList(): void
+    public function testGetTodoList(): void
     {
         $client = $this->createAuthenticatedClient();
-        $crawler = $client->request(Request::METHOD_GET, $this->generateUrl('task_list'));
+        $crawler = $client->request(Request::METHOD_GET, $this->generateUrl('task_to_do'));
 
         $this->assertEquals(Response::HTTP_OK, $client->getResponse()->getStatusCode());
-        $this->assertStringContainsString('Créer une tâche', $crawler->filter('.create-task-btn')->text());
+        $this->assertStringContainsString('Test to do task', $crawler->filter('.task-title')->text());
+    }
+
+    public function testGetDoneList(): void
+    {
+        $client = $this->createAuthenticatedClient();
+        $crawler = $client->request(Request::METHOD_GET, $this->generateUrl('task_done'));
+
+        $this->assertStringContainsString('Test done task', $crawler->filter('.task-title')->text());
     }
 
     public function testCreateTask(): void
@@ -125,7 +134,7 @@ class TaskControllerTest extends BaseWebTestCase
     public function testDeleteTaskByNonConnectedUserDenied(): void
     {
         $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
-        $task = $taskRepository->findOneBy(['title' => 'Test task']);
+        $task = $taskRepository->findOneBy(['title' => 'Test done task']);
         $this->client->request(Request::METHOD_GET, $this->generateUrl('task_delete', ['id' => $task->getId()]));
         $this->assertEquals(Response::HTTP_FOUND, $this->client->getResponse()->getStatusCode());
         $this->assertStringContainsString('/login', $this->client->getResponse()->headers->get('location'));
@@ -135,7 +144,7 @@ class TaskControllerTest extends BaseWebTestCase
     {
         $client = $this->createAuthenticatedClient();
         $taskRepository = $client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
-        $task = $taskRepository->findOneBy(['title' => 'Test task']);
+        $task = $taskRepository->findOneBy(['title' => 'Test done task']);
         $client->request(Request::METHOD_GET, $this->generateUrl('task_delete', ['id' => $task->getId()]));
         $this->assertEquals(Response::HTTP_FORBIDDEN, $client->getResponse()->getStatusCode());
         $this->assertStringContainsString(
@@ -155,7 +164,9 @@ class TaskControllerTest extends BaseWebTestCase
     {
         $client = $this->createAuthenticatedClient('admin@test.fr');
         $taskRepository = $client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
-        $task = $taskRepository->findOneBy(['title' => 'Test task']);
+        $userRepository = $client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
+        $user = $userRepository->findOneBy(['username' => 'anonyme']);
+        $task = $taskRepository->findOneBy(['author' => $user]);
         $client->request(Request::METHOD_GET, $this->generateUrl('task_delete', ['id' => $task->getId()]));
         $this->assertEquals(Response::HTTP_FOUND, $client->getResponse()->getStatusCode());
         $crawler = $this->client->followRedirect();

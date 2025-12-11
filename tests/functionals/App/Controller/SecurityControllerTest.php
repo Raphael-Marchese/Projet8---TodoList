@@ -30,7 +30,7 @@ class SecurityControllerTest extends BaseWebTestCase
 
         $crawler = $this->client->followRedirect();
 
-        $this->assertStringContainsString('Bienvenue sur Todo List', $crawler->filter('h1')->text());
+        $this->assertStringContainsString('Bienvenue sur To Do List', $crawler->filter('h1')->text());
         $this->assertStringContainsString('Se déconnecter', $crawler->filter('.btn-danger')->text());
 
         $logoutLink = $crawler->selectLink('Se déconnecter');
@@ -38,7 +38,7 @@ class SecurityControllerTest extends BaseWebTestCase
         $this->client->click($logoutLink->link());;
         $crawler = $this->client->followRedirect();
 
-        $this->assertStringContainsString('Bienvenue sur Todo List', $crawler->filter('h1')->text());
+        $this->assertStringContainsString('Bienvenue sur To Do List', $crawler->filter('h1')->text());
         $this->assertStringContainsString('Se connecter', $crawler->filter('.btn-success')->text());
     }
 

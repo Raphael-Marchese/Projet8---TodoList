@@ -44,9 +44,16 @@ class AppFixtures extends Fixture
         $manager->flush();
 
         $task = new Task;
-        $task->setTitle('Test task');
-        $task->setContent('Test content');
+        $task->setTitle('Test done task');
+        $task->setContent('Test done content');
+        $task->toggle(true);
         $manager->persist($task);
+
+        $todoTask = new Task;
+        $todoTask->setTitle('Test to do task');
+        $todoTask->setContent('Test todo content');
+        $todoTask->toggle(false);
+        $manager->persist($todoTask);
 
         $manager->flush();
     }
