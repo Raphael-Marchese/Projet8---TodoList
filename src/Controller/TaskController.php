@@ -23,12 +23,21 @@ class TaskController extends AbstractController
         $this->doctrine = $doctrine;
     }
 
-    #[Route('/tasks', name: 'task_list')]
-    public function listAction(): Response
+    #[Route('/tasks/to-do', name: 'task_to_do')]
+    public function getToDoList(): Response
     {
         return $this->render(
             'task/list.html.twig',
-            ['tasks' => $this->doctrine->getRepository(Task::class)->findAll()]
+            ['tasks' => $this->doctrine->getRepository(Task::class)->findBy(['isDone' => false], ['createdAt' => 'DESC'])]
+        );
+    }
+
+    #[Route('/tasks/done', name: 'task_done')]
+    public function getDoneList(): Response
+    {
+        return $this->render(
+            'task/list.html.twig',
+            ['tasks' => $this->doctrine->getRepository(Task::class)->findBy(['isDone' => true], ['createdAt' => 'DESC'])]
         );
     }
 
@@ -48,7 +57,7 @@ class TaskController extends AbstractController
 
             $this->addFlash('success', 'La tâche a été bien été ajoutée.');
 
-            return $this->redirectToRoute('task_list');
+            return $this->redirectToRoute('task_to_do');
         }
         if ($form->isSubmitted() && !$form->isValid()) {
             return $this->render('task/create.html.twig', [
@@ -70,7 +79,7 @@ class TaskController extends AbstractController
 
             $this->addFlash('success', 'La tâche a bien été modifiée.');
 
-            return $this->redirectToRoute('task_list');
+            return $this->redirectToRoute('task_to_do');
         }
 
         return $this->render('task/edit.html.twig', [
@@ -88,7 +97,7 @@ class TaskController extends AbstractController
 
         $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle()));
 
-        return $this->redirectToRoute('task_list');
+        return $this->redirectToRoute('task_to_do');
     }
 
     #[Route('/tasks/{id}/delete', name: 'task_delete')]
@@ -101,6 +110,6 @@ class TaskController extends AbstractController
 
         $this->addFlash('success', 'La tâche a bien été supprimée.');
 
-        return $this->redirectToRoute('task_list');
+        return $this->redirectToRoute('task_to_do');
     }
 }
