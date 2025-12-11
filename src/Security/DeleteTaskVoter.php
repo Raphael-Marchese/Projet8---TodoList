@@ -15,11 +15,11 @@ class DeleteTaskVoter extends Voter
 {
 
     public function __construct(
-        private AccessDecisionManagerInterface $accessDecisionManager,
+        private readonly AccessDecisionManagerInterface $accessDecisionManager,
     ) {
     }
 
-    const DELETE = 'delete';
+    public const DELETE = 'delete';
 
     protected function supports(string $attribute, mixed $subject): bool
     {
