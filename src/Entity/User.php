@@ -49,7 +49,7 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
         $this->username = $username;
     }
 
-    public function getSalt()
+    public function getSalt(): null
     {
         return null;
     }
@@ -59,7 +59,7 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
         return $this->password;
     }
 
-    public function setPassword($password)
+    public function setPassword($password): void
     {
         $this->password = $password;
     }

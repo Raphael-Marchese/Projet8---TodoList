@@ -35,9 +35,12 @@ exclude:
   - name: All
     paths:
       - vendor
-  - name: All
-    paths:
+      - var
+      - public
+      - config
       - bin
-  - name: All
-    paths:
-      - web
+      - migrations
+      - tests
+      - templates
+      - test_coverage
+      - app

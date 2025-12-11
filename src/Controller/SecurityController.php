@@ -26,7 +26,7 @@ class SecurityController extends AbstractController
      * @codeCoverageIgnore
      */
     #[Route('/login_check', name: 'login_check')]
-    public function loginCheck()
+    public function loginCheck(): void
     {
         // This code is never executed.
     }
@@ -35,7 +35,7 @@ class SecurityController extends AbstractController
      * @codeCoverageIgnore
      */
     #[Route('/logout', name: 'logout')]
-    public function logoutCheck()
+    public function logoutCheck(): void
     {
         // This code is never executed.
     }
