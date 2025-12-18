@@ -1,0 +1,27 @@
+@startuml
+!theme plain
+actor User
+participant "TaskController" as Controller
+participant "TaskType" as Form
+entity "Task" as Entity
+database "Database" as DB
+
+User -> Controller : GET /tasks/create
+Controller -> Form : createForm(TaskType, new Task)
+Controller -> User : Render create.html.twig
+
+User -> Controller : POST /tasks/create (title, content)
+Controller -> Form : handleRequest(request)
+Form -> Entity : Update properties
+
+alt Form is Valid
+    Controller -> Controller : Set Task Author (Current User)
+    Controller -> DB : persist(task)
+    Controller -> DB : flush()
+    DB -> Controller : Success
+    Controller -> User : Redirect to /tasks/to-do (Flash success)
+else Form is Invalid
+    Controller -> User : Render create.html.twig with errors
+end
+@enduml
+

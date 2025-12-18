@@ -1,0 +1,28 @@
+@startuml
+!theme plain
+hide circle
+skinparam linetype ortho
+
+entity "User" as user {
+  *id : int
+  --
+  *username : string
+  *password : string
+  *email : string
+  roles : json
+}
+
+entity "Task" as task {
+  *id : int
+  --
+  *createdAt : datetime
+  *title : string
+  *content : text
+  isDone : boolean
+  --
+  author_id : int <<FK>>
+}
+
+user ||..o{ task : "has created"
+@enduml
+

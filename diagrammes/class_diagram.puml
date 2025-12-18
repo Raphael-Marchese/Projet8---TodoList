@@ -1,0 +1,76 @@
+@startuml
+!theme plain
+
+package "Controller" {
+    class DefaultController {
+        +indexAction()
+    }
+
+    class SecurityController {
+        +loginAction()
+        +loginCheck()
+        +logoutCheck()
+    }
+
+    class TaskController {
+        -doctrine
+        +getToDoList()
+        +getDoneList()
+        +createAction()
+        +editAction()
+        +toggleTaskAction()
+        +deleteTaskAction()
+    }
+
+    class UserController {
+        -hasher
+        -doctrine
+        +listAction()
+        +createAction()
+        +editAction()
+    }
+}
+
+package "Entity" {
+    class User {
+        -id: int
+        -username: string
+        -password: string
+        -email: string
+        -roles: array
+        +getId()
+        +getUsername()
+        +getRoles()
+    }
+
+    class Task {
+        -id: int
+        -createdAt: datetime
+        -title: string
+        -content: text
+        -isDone: boolean
+        -author: User
+        +getId()
+        +getTitle()
+        +toggle()
+    }
+}
+
+package "Form" {
+    class TaskType {
+        +buildForm()
+    }
+
+    class UserType {
+        +buildForm()
+    }
+}
+
+TaskController ..> Task : uses
+TaskController ..> TaskType : uses
+UserController ..> User : uses
+UserController ..> UserType : uses
+Task "0..*" --> "0..1" User : author
+
+@enduml
+
