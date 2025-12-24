@@ -3,12 +3,11 @@
 ## Sécurité des Mots de Passe
 
 Lors de la création ou de la modification d'un utilisateur, le mot de passe doit **toujours** être haché avant d'être persisté en base. Cela est géré dans le contrôleur (`UserController`) ou via un écouteur d'événements Doctrine, en utilisant le service `UserPasswordHasherInterface`.
+## Comment modifier l'authentification ?
+
 *   **Modifier le formulaire de login** : Modifiez le template `templates/security/login.html.twig`.
 *   **Ajouter des champs à l'utilisateur** : Modifiez l'entité `src/Entity/User.php` et créez une migration Doctrine.
 *   **Changer les règles d'accès** : Modifiez la section `access_control` dans `config/packages/security.yaml`.
-
-## Comment modifier l'authentification ?
-
 Cela signifie qu'un administrateur possède implicitement tous les droits d'un utilisateur standard.
 ```
     ROLE_ADMIN: [ROLE_USER]
