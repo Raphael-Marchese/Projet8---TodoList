@@ -20,7 +20,7 @@ entity "Task" as task {
   *content : text
   isDone : boolean
   --
-  author_id : int <<FK>>
+  *author_id : int <<FK>>
 }
 
 user ||..o{ task : "has created"
