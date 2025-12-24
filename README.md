@@ -45,10 +45,14 @@ Ce projet est une application de gestion de tâches (To-Do List) développée av
 4.  **Lancer le serveur :**
 
     ```bash
-    symfony server:start
+    # rentrer dans le container php 
+    docker compose exec php bash
+    
+    # Lancement du serveur dans le container
+    php -S 0.0.0.0:8000 -t public
     ```
 
-    L'application sera accessible à l'adresse indiquée (généralement `http://127.0.0.1:8000`).
+    L'application sera accessible à l'adresse indiquée (`http://localhost:8000` ou http://0.0.0.0:8000/).
 
 ## Tests
 

@@ -20,7 +20,7 @@ Pour maintenir une base de code saine et maintenable, les règles suivantes doiv
 ### 1. Qualité du Code
 
 *   **Standards PHP** : Le code doit respecter les standards **PSR-12**.
-*   **Analyse Statique** : Le code doit être analysé pour détecter les problèmes potentiels. Nous utilisons des outils comme Codacy ou CodeClimate. Assurez-vous de ne pas introduire de nouvelles "code smells".
+*   **Analyse Statique** : Le code doit être analysé pour détecter les problèmes potentiels. Nous utilisons des outils comme Codacy, CodeClimate ou dernièrement, Qodana. Assurez-vous de ne pas introduire de nouvelles "code smells".
 *   **Clarté** : Nommez vos variables, classes et méthodes de manière explicite (en anglais de préférence, ou cohérent avec l'existant).
 
 ### 2. Tests Automatisés
