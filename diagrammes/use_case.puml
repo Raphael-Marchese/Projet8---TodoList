@@ -1,0 +1,53 @@
+@startuml
+!theme plain
+left to right direction
+
+actor "Utilisateur (Anonyme)" as Guest
+actor "Utilisateur Connecté" as User
+actor "Administrateur" as Admin
+
+User <|-- Admin
+
+package "Application ToDoList" {
+    usecase "Se connecter" as UC_Login
+    usecase "Se déconnecter" as UC_Logout
+
+    usecase "Consulter la liste des tâches" as UC_ListTasks
+    usecase "Créer une tâche" as UC_CreateTask
+    usecase "Modifier une tâche" as UC_EditTask
+    usecase "Marquer une tâche comme faite/à faire" as UC_ToggleTask
+    usecase "Supprimer sa propre tâche" as UC_DeleteOwnTask
+
+    usecase "Gérer les utilisateurs" as UC_ManageUsers
+    usecase "Créer un utilisateur" as UC_CreateUser
+    usecase "Modifier un utilisateur" as UC_EditUser
+    usecase "Supprimer une tâche anonyme" as UC_DeleteAnonTask
+
+    (UC_ManageUsers) .> (UC_CreateUser) : include
+    (UC_ManageUsers) .> (UC_EditUser) : include
+}
+
+Guest --> UC_Login
+
+User --> UC_Logout
+User --> UC_ListTasks
+User --> UC_CreateTask
+User --> UC_EditTask
+User --> UC_ToggleTask
+User --> UC_DeleteOwnTask
+
+Admin --> UC_ManageUsers
+Admin --> UC_DeleteAnonTask
+
+note right of UC_DeleteAnonTask
+  Seul un administrateur peut
+  supprimer les tâches "anonymes"
+end note
+
+note right of UC_DeleteOwnTask
+  Un utilisateur ne peut supprimer
+  que les tâches qu'il a créées
+end note
+
+@enduml
+

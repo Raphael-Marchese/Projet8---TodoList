@@ -1,0 +1,28 @@
+@startuml
+!theme plain
+actor User
+participant "SecurityController" as Controller
+participant "LoginFormAuthenticator" as Authenticator
+participant "UserProvider" as Provider
+database "Database" as DB
+
+User -> Controller : GET /login
+Controller -> User : Returns login form
+
+User -> Controller : POST /login_check (username, password)
+Controller -> Authenticator : authenticate(credentials)
+Authenticator -> Provider : loadUserByUsername(username)
+Provider -> DB : SELECT * FROM user WHERE username = ?
+DB -> Provider : User data
+Provider -> Authenticator : User object
+Authenticator -> Authenticator : checkCredentials(password, hash)
+
+alt Valid credentials
+    Authenticator -> Controller : Authentication Success
+    Controller -> User : Redirect to Homepage (302)
+else Invalid credentials
+    Authenticator -> Controller : Authentication Failure
+    Controller -> User : Redirect to /login with error
+end
+@enduml
+
