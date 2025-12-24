@@ -59,6 +59,11 @@ class DeleteTaskVoter extends Voter
             return true;
         }
 
+        if (!$task->author && $this->accessDecisionManager->decide($token, ['ROLE_ADMIN']
+            )) {
+            return true;
+        }
+
         $vote?->addReason('Vous n\'avez pas la permission de supprimer cette tâche. Veuillez contacter un administrateur.');
 
         return false;

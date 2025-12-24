@@ -38,7 +38,7 @@ class Task
     private $isDone;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     public ?User $author = null;
 
     public function __construct()
