@@ -34,12 +34,21 @@ Ce projet est une application de gestion de tâches (To-Do List) développée av
     ```bash
     # Création de la base de données
     php bin/console doctrine:database:create
-
-    # Exécution des migrations
-    php bin/console doctrine:migrations:migrate
+    
+    # Update du schema
+    php bin/console doctrine:schema:update --force
 
     # Chargement des données de test (Fixtures)
     php bin/console doctrine:fixtures:load
+    
+    # Exécution des migrations (après les fixtures pour gérer le cas des auteurs anonymes)
+    php bin/console doctrine:migrations:migrate
+    ```
+    
+    Ou simplement lancer un 
+
+    ```bash
+    make init-db
     ```
 
 4.  **Lancer le serveur :**
