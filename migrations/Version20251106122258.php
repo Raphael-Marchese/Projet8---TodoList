@@ -27,7 +27,7 @@ final class Version20251106122258 extends AbstractMigration
             SET author_id = (SELECT id FROM `user` WHERE username = 'anonyme')
             WHERE author_id IS NULL
         ");
-        $this->addSql('ALTER TABLE task MODIFY author_id INT NOT NULL');
+        $this->addSql('ALTER TABLE task MODIFY author_id INT');
 
     }
 
